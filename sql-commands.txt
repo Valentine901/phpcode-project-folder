@@ -1,0 +1,50 @@
+
+//  Prepare the SQL statement with a placeholder (:email)
+$stmt = $pdo->prepare('SELECT id, name FROM users WHERE email = :email');
+
+// Execute the query by passing the actual data
+$stmt->execute(['email' => 'user@example.com']);
+
+// Fetch the results
+$user = $stmt->fetch(); 
+
+if ($user) {
+    echo "User found: " . $user['name'];
+}
+
+
+
+
+// TO INSERT DATA INTO THE DATABASE
+$sql = "INSERT INTO users (name, email, age) VALUES (:name, :email, :age)";
+$stmt = $pdo->prepare($sql);
+
+$stmt->execute([
+    'name'  => 'John Doe',
+    'email' => 'john@example.com',
+    'age'   => 28
+]);
+
+echo "New user added! ID: " . $pdo->lastInsertId();
+
+
+// TO UPDATE DATA IN DATABASE 
+$sql = "UPDATE users SET email = :email WHERE id = :id";
+$stmt = $pdo->prepare($sql);
+
+$stmt->execute([
+    'email' => 'new_email@example.com',
+    'id'    => 5
+]);
+
+echo "Rows updated: " . $stmt->rowCount();
+
+
+
+// TO DELETE DATA IN DATABASE
+$sql = "DELETE FROM users WHERE id = :id";
+$stmt = $pdo->prepare($sql);
+
+$stmt->execute(['id' => 12]);
+
+echo "Rows deleted: " . $stmt->rowCount();
