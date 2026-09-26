@@ -5,6 +5,9 @@ require_once 'includes/header.php';
 
 $posts = [];
 $categories = [];
+$fetchData = [];
+$isComment = false;
+
 
 $stmt = $pdo->query("SELECT * FROM posts ORDER BY id DESC");
 $posts = $stmt->fetchAll();
@@ -12,40 +15,92 @@ $posts = $stmt->fetchAll();
 $stmt = $pdo->query("SELECT * FROM categories ORDER BY id DESC");
 $categories = $stmt->fetchAll();
 
+if ($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["search"])) {
+    $data = trim($_GET["search"]);
+    $sql = "SELECT * FROM posts WHERE user =:data OR category =:data";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([
+        ":data" => $data
+    ]);
+    // PDO::FETCH_ASSOC is to fetch a record that has any similar value as the search data
+    $fetchData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
 
 ?>
 
+
 <body class="flex-col gap-4 w-full max-w-screen">
+
     <div class="flex items-center text-center justify-center w-full mx-auto">
         <h2 class="text-gray-700 font-semebold text-2xl md:text-3xl lg:text-4xl text-center">Start blogging and viewing other authors blogs</h2>
     </div>
 
 
-    <div class="flex justify-center items-center max-w-2xl w-full mt-5 mx-auto">
-        <input type="text" class="flex mx-auto w-full p-2.5 border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-900 transition-colors" placeholder="Search posts by authors and categories">
-    </div>
+    <!-- searching input -->
+    <form method="GET" class="flex justify-center items-center max-w-2xl w-full mt-15 mx-auto gap-2">
+        <input type="text" name="search" class="flex text-xl placeholder:text-sm mx-auto w-full p-2.5 border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-900 transition-colors" placeholder="Search posts by authors and categories">
+        <button class="py-3 px-6 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 transition-all duration-300 rounded-lg border-none text-white" type="submit" name="submit_search">Search</button>
+    </form>
 
 
     <?php if (count($posts) > 0) :  ?>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 p-4">
+        <div class="gap-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mt-24 ">
+        
+        <!-- comment modal -->
+        <?php if ($isComment === true) : ?>
+        <div id="modal" class="bg-gray-900/50 rounded-lg p-4 w-full max-w-lg absolute top-70 left-100 text-center mx-auto z-999 max-h-64 h-full flex flex-col gap-2 text-white">
+            <form class="w-full flex gap-1">
+                <input type="text" name="comment_name" placeholder="Type your comment" class="px-3 py-2 border border-gray-900 outline-none focus:ring-1 focus:ring-blue-900/50 focus:ring-offset-1 w-full rounded-md">
+                <button class="py-2 px-6 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 transition-all duration-300 text-white font-semibold text-md rounded-md">send</button>
+            </form>
+            <div>
+                <h2>Comment here</h2>
+            </div>
+            <i class="fa-solid fa-times fixed top-90 left-103"></i>
+        </div>
+        <?php endif ?>
+
             <?php foreach ($posts as $post) : ?>
-                <div class="max-w-sm w-full h-full overflow-hidden bg-gray-700/10 p-1 pb-2  rounded-lg text-md flex flex-col">
+                <div class="md:max-w-sm w-full h-full overflow-hidden bg-gray-700/10 p-1 pb-2  rounded-lg text-md flex flex-col items-center mx-auto">
                     <?php if (!empty($post['image'])): ?>
-                        <div class="w-full h-lg overflow-hidden border-b border-slate-100 mb-2 rounded-lg ">
+                        <a href="/phpcodes/simple-blog/posts/post.php/?id=<?php echo $post["id"]; ?>" class="w-full h-lg overflow-hidden border-b border-slate-100 mb-2 rounded-lg ">
                             <img
                                 src="<?php echo htmlspecialchars($post['image']); ?>"
                                 alt=""
                                 class="w-full h-48 object-cover hover:scale-105 duration-500 transition-all " />
-                        </div>
+                        </a>
                     <?php else: ?>
 
                         <div class="w-full h-64 bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center border-b border-slate-100">
                             <span class="text-4xl">📝</span>
                         </div>
                     <?php endif; ?>
-                    <p class="p-3 overflow-y-auto h-32 -webkit-font-smoothing: antialiased scrollbar-none"><?php echo $post["content"] ?></p>
+
+                    <!-- quick actions -->
+                    <div class="flex">
+                        <p class="p-3 overflow-y-auto h-32 -webkit-font-smoothing: antialiased scrollbar-none"><?php echo $post["content"] ?></p>
+                        <div class=" text-2xl z-999 text-gray-700  flex flex-col gap-4 pt-4">
+                            <a href="" class="flex flex-col items-center hover:text-gray-800 transition-all duration-300">
+                                <i class="fa-solid fa-user"></i>
+                            </a>
+
+                            <button 
+                            type="button"
+                            data-post-id="<?php echo $post["id"] ?>" 
+                            class="flex flex-col items-center hover:text-gray-800  transition-all duration-300">
+                                <i title="comments" class="fa-solid fa-comment hover:scale-101"></i>
+                                <span class="text-sm font-semibold">27</span>
+                            </button>
+                        </div>
+                    </div>
+
+
                 </div>
             <?php endforeach ?>
+
+
         </div>
 
     <?php else: ?>
@@ -58,5 +113,12 @@ $categories = $stmt->fetchAll();
 
 </body>
 
+<script>
+    const modal = document.getElementById("modal");
+
+    modal.addEventListener("click", () => {
+        const postId = 0;
+    })
+</script>
 
 <?php require_once "includes/footer.php"  ?>

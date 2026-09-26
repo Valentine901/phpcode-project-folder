@@ -1,8 +1,8 @@
 <?php
 
-if (session_start() === PHP_SESSION_NONE) {
-    session_start();
-}
+// if (session_start() === PHP_SESSION_NONE) {
+//     session_start();
+// }
 
 require_once "config/database.php";
 require_once "includes/header.php";

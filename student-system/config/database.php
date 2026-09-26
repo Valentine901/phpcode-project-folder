@@ -1,5 +1,22 @@
 <?php
 
+// NOTE W3SCHOOL PROVIDES BETTER, DIFFERENT AND SIMPLER VERSION OF DATABASE CONNECTION SETUP
+// $servername = "localhost";
+// $username = "username";
+// $password = "password";
+// $dbname = "mydb";
+
+// // Create connection
+// $conn = mysqli_connect($servername, $username, $password, $dbname);
+
+// // Check connection
+// if (!$conn) {
+//   die("Connection failed: " . mysqli_connect_error());
+// }
+// echo "Connected successfully";
+
+
+
 $host = "127.0.0.1"; // localhost
 $db = "school_db"; // database name
 $user = "root"; // xampp username
