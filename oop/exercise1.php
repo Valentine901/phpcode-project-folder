@@ -6,21 +6,22 @@
 
 class Department
 {
-    public $name;
-    public $courses = [];
-    public $teachers = [];
-    public $students = [];
-    public $setError = "";
-    public $setSuccess = "";
+    public string $class;
+    public string $name;
+    public array $courses = [];
+    public array $teachers = [];
+    public array $students = [];
+    public string $setError = "";
+    public string $setSuccess = "";
 
-    public function __construct($name, $courses, $teachers, $students, $setError, $setSuccess)
+    public function __construct($name)
     {
         $this->name = $name;
-        $this->courses = $courses;
-        $this->teachers = $teachers;
-        $this->students = $students;
-        $this->setError = $setError;
-        $this->setSuccess = $setSuccess;
+        $this->courses = [];
+        $this->teachers = [];
+        $this->students = [];
+        $this->setError = "";
+        $this->setSuccess = "";
     }
 
     // students actions 
@@ -36,17 +37,25 @@ class Department
         }
     }
 
+    // neeed to update this code
     public function remove_student(Student $student) {
         if (!in_array($student, $this -> students)) {
-            $this -> setError = "Student you want to deleted did not exist";
+            $this -> setError = "Student you want to deleted does not exist";
         }else {
-            foreach($this -> students as $key => $value) {
-                unset($this -> students[$key]);
-            }
+
+            unset($this -> students[$student]);
             $this -> setSuccess = "Student deleted successfully";
         }
     }
 
+    // need to update this code
+    public function update_student(Student $student) {
+        if (!in_array($student, $this -> students)) {
+            $this -> setError = "Student you want to update does not exist";
+        } else {
+            $this -> students[] = $student;       
+        }
+    }
     // teachers actions
 
     // course actions
@@ -55,17 +64,17 @@ class Department
 
 class Student extends Department
 {
-    public $student_name;
-    public $student_age;
-    public $student_reg;
-    public $student_courses = [];
+    public string $student_name;
+    public int $student_age;
+    public string $student_reg;
+    public array $student_courses = [];
 
-    public function __construct($student_age, $student_name, $student_reg, $student_courses)
+    public function __construct($student_age, $student_name, $student_reg)
     {
         $this->student_name = $student_name;
         $this->student_age = $student_age;
         $this->student_reg = $student_reg;
-        $this->student_courses = $student_courses;
+        $this->student_courses = [];
     }
 
     public function get_student_details()
@@ -78,34 +87,21 @@ class Student extends Department
     }
 }
 
-class Teacher extends Department
-{
-    public $teacher_name;
-    public $course_incharge;
-    public $contact;
 
-    function __construct($teacher_name, $course_incharge, $contact)
-    {
-        $this->teacher_name = $teacher_name;
-        $this->course_incharge = $course_incharge;
-        $this->contact = $contact;
-    }
 
-    public function get_teacher_details()
-    {
-        return
-            "Teacher Name: " . $this->teacher_name . "<br>
-            Course Incharge: " . $this->course_incharge . "<br> 
-            Teacher Contact: " . $this->contact . "<br>";
-    }
+$computer_science = new Department("Computer Science");
+$stud1 = new Student(27, "valentine", "STU-1002");
+$stud2 = new Student(18, "Chadwick", "STU-2004");
+$stud3 = new Student(19, "Edward", "STU-1003");
+
+$computer_science -> add_student($stud1);
+$computer_science -> add_student($stud2);
+
+$computer_science -> update_student($stud3);
+
+foreach($computer_science -> students as $student) {
+    echo $student -> get_student_details() . "<br>";
 }
 
-class Course
-{
-    public $course_name;
 
-    public function __construct($course_name)
-    {
-        $this->course_name = $course_name;
-    }
-}
+?>
